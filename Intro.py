@@ -6,6 +6,33 @@ BLACK = (0, 0, 0)
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 
+pygame.init()
+
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+Icon = pygame.image.load('img/Icon.png')
+pygame.display.set_caption('Lucidian Dreamer')
+pygame.display.set_icon(Icon)
+
+Logo = pygame.image.load('img/Logo.png')
+
+scroll = [0] * 5
+speeds = [1, 1.5, 2, 2.5, 3]
+
+bg_images = []
+bg_widths = []
+
+moon_image = None
+for i in range(1, 6):
+    bg_image = pygame.image.load(f"img/BG/{i}.png").convert_alpha()
+    bg_images.append(bg_image)
+    bg_widths.append(bg_image.get_width())
+
+def draw_bg(screen):
+    for i in range(len(bg_images)):
+        scroll[i] %= bg_widths[i] #각 배경의 스크롤 값을 조정함
+        screen.blit(bg_images[i], (-scroll[i], 0)) #배경 이미지 화면에 출력 
+        screen.blit(bg_images[i], (bg_widths[i] - scroll[i], 0)) #두번째 배경 이미지를 화면에 출력
+
 #페이드 인 애니메이션 재생
 def fade_in(screen, images, rects, duration, delay=0):
     clock = pygame.time.Clock()
@@ -24,7 +51,6 @@ def fade_in(screen, images, rects, duration, delay=0):
 
         pygame.display.update()
         clock.tick(duration)
-
 # 페이드 아웃 애니메이션 재생
 def fade_out(screen, image, x, y, duration):
     clock = pygame.time.Clock()
@@ -38,8 +64,8 @@ def fade_out(screen, image, x, y, duration):
         pygame.display.update()
         clock.tick(duration)
 
+#메인 화면 보여주기
 def main_menu(screen, fade_done):
-    screen.fill(BLACK)
 
     Title = pygame.image.load('img/Title1.png')
     Start = pygame.image.load('img/Slot/Slot1.png')
@@ -67,15 +93,7 @@ def main_menu(screen, fade_done):
     pygame.display.update()
 
 def main():
-    pygame.init()
-
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    Icon = pygame.image.load('img/Icon.png')
-    pygame.display.set_caption('Lucidian Dreamer')
-    pygame.display.set_icon(Icon)
-
-    Logo = pygame.image.load('img/Logo.png')
-
+    global scroll
     running = True
     isMain = False
     Intro = False
@@ -94,13 +112,18 @@ def main():
                     running = False
                     pygame.quit()
                     sys.exit()
-        if Intro == False:
+        if not Intro:
             fade_in(screen, [Logo], [(logo_x, logo_y)], 60)
             pygame.time.delay(2000)
             fade_out(screen, Logo, logo_x, logo_y, 60)
             Intro = True
             isMain = True
-        elif isMain == True:
+        elif isMain:
+            draw_bg(screen)
+            for i in range(len(scroll)):
+                scroll[i] += speeds[i] #각 배경의 속도에 따라 스크롤 값이 증가됨
+                if scroll[i] >= bg_widths[i]: #각 배경 이미지의 너비에 도달하면 실행
+                    scroll[i] = 0  #스크롤 값 초기화
             main_menu(screen, fade_done)
             fade_done = True
 
