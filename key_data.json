@@ -1,0 +1,9 @@
+{
+    "Keys": {
+        "Left": "left",
+        "Right": "right",
+        "Jump": "up",
+        "Down": "x",
+        "Gliding": "a"
+    }
+}
