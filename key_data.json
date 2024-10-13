@@ -3,7 +3,7 @@
         "Left": "left",
         "Right": "right",
         "Jump": "up",
-        "Down": "x",
+        "Down": "down",
         "Gliding": "a"
     }
 }

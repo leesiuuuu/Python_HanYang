@@ -11,51 +11,6 @@ pygame.init()
 
 key_file = 'key_data.json'
 
-default_key_mapping = {
-    "Left": pygame.K_LEFT,
-    "Right": pygame.K_RIGHT,
-    "Jump": pygame.K_UP,
-    "Down": pygame.K_DOWN,
-    "Gliding": pygame.K_a
-}
-
-# 키 이름을 pygame 키 코드로 변환하는 함수
-def get_key_code(key_name):
-    key_mapping = {
-        "left": pygame.K_LEFT,
-        "right": pygame.K_RIGHT,
-        "up": pygame.K_UP,
-        "down": pygame.K_DOWN,
-        "a": pygame.K_a,  # "Gliding"을 위한 매핑 추가
-        # 추가적인 키 매핑이 필요하면 여기 추가
-    }
-    return key_mapping.get(key_name.lower(), None)  # 기본적으로 None 반환
-
-
-# 키 매핑을 JSON 파일에 저장하는 함수
-def save_key_mapping(key_mapping):
-    with open(key_file, 'w') as f:
-        # 각 키를 이름으로 변환하여 저장
-        json.dump({"Keys": {k: pygame.key.name(v) for k, v in key_mapping.items()}}, f, indent=4)
-
-def load_key_mapping():
-    try:
-        with open(key_file, 'r') as f:
-            data = json.load(f)
-            # 각 키의 값을 get_key_code를 사용하여 pygame 키 코드로 변환
-            loaded_keys = {k: get_key_code(v) for k, v in data["Keys"].items()}
-
-            # 모든 키가 존재하는지 확인하고 없으면 기본 매핑으로 설정
-            for key in default_key_mapping.keys():
-                if key not in loaded_keys or loaded_keys[key] is None:
-                    loaded_keys[key] = default_key_mapping[key]  # 기본값으로 대체
-
-            return loaded_keys
-    except (FileNotFoundError, json.JSONDecodeError) as e:
-        print(f"Error loading key mapping: {e}. Using default mapping.")
-        return default_key_mapping  # 기본 키 매핑 반환
-
-
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 Icon = pygame.image.load('img/Icon.png')
@@ -77,6 +32,24 @@ for i in range(1, 6):
     bg_widths.append(bg_image.get_width())
 
 Selete = pygame.image.load('img/Slot/SlotSelete.png')  # 선택 오브젝트 이미지
+
+def load_key_mapping():
+    with open(key_file, 'r') as f:
+        key_data = json.load(f)
+        key_mapping = {}
+        for action, key in key_data["Keys"].items():
+            # 알파벳 키는 소문자로 처리, 나머지는 그대로
+            if len(key) == 1 and key.isalpha():
+                key_mapping[action] = getattr(pygame, f"K_{key.lower()}")
+            else:
+                key_mapping[action] = getattr(pygame, f"K_{key.upper()}")
+    return key_mapping
+
+
+def save_key_mapping(key_mapping):
+    key_data = {"Keys": {action: pygame.key.name(key) for action, key in key_mapping.items()}}
+    with open(key_file, 'w') as f:
+        json.dump(key_data, f, indent=4)
 
 def draw_bg(screen):
     for i in range(len(bg_images)):
@@ -192,8 +165,6 @@ def main():
     Jump = key_mapping["Jump"]
     DownKey = key_mapping["Down"]
     Gliding = key_mapping["Gliding"]
-    #이 변수는 시간에 따라 사용될 수도 있고 지워질 수도 있음
-    MagicKey = pygame.K_s
 
     images, rects = main_menu(screen)
 
@@ -235,7 +206,6 @@ def main():
                                 print("game Start")
                             elif selected_index == 2:
                                 print("option")
-                                isOption = True
                                 changing_key = True
                             elif selected_index == 3:
                                 running = False
@@ -271,8 +241,5 @@ def main():
 
         pygame.display.update()
 
-    pygame.quit()
-    sys.exit()
-
-
-main()
+if __name__ == '__main__':
+    main()
