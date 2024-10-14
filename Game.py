@@ -11,6 +11,15 @@ pygame.init()
 
 key_file = 'key_data.json'
 
+# default_mapping = {
+#     "Jump": pygame.K_UP,
+#     "Down": pygame.K_DOWN,
+#     "Left": pygame.K_LEFT,
+#     "Right": pygame.K_RIGHT,
+#     # 다른 키 추가 예정
+# }
+# 일단 보류
+
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 Icon = pygame.image.load('img/Icon.png')
@@ -31,20 +40,18 @@ for i in range(1, 6):
     bg_images.append(bg_image)
     bg_widths.append(bg_image.get_width())
 
-Selete = pygame.image.load('img/Slot/SlotSelete.png')  # 선택 오브젝트 이미지
+Selete = pygame.image.load('img/Slot/SlotSelete.png')
 
 def load_key_mapping():
     with open(key_file, 'r') as f:
         key_data = json.load(f)
         key_mapping = {}
         for action, key in key_data["Keys"].items():
-            # 알파벳 키는 소문자로 처리, 나머지는 그대로
             if len(key) == 1 and key.isalpha():
                 key_mapping[action] = getattr(pygame, f"K_{key.lower()}")
             else:
                 key_mapping[action] = getattr(pygame, f"K_{key.upper()}")
     return key_mapping
-
 
 def save_key_mapping(key_mapping):
     key_data = {"Keys": {action: pygame.key.name(key) for action, key in key_mapping.items()}}
@@ -65,7 +72,7 @@ def fade_in_bg_and_menu(screen, bg_images, moon_image, images, rects, duration, 
     fade_bg_surfaces = [bg.copy().convert_alpha() for bg in bg_images]
     fade_menu_surfaces = [image.copy().convert_alpha() for image in images]
     moon_fade = moon_image.copy().convert_alpha()
-    selete_fade = Selete.copy().convert_alpha()  # Selete 이미지 복사
+    selete_fade = Selete.copy().convert_alpha()
 
     for alpha in range(0, 256, 5):
         screen.fill(BLACK)
@@ -184,7 +191,10 @@ def main():
                 running = False
             elif event.type == pygame.KEYDOWN:
                 if changing_key:  # 키 변경 모드 활성화 중
-                    if selected_index == 2:  # 예를 들어, Option 메뉴에서 변경
+                    if selected_index == 2:  #Option 메뉴에서 변경
+                        # if event.key == pygame.K_d: #기본 설정으로 돌아가기
+                        #     key_mapping = default_mapping.copy()
+                        # 일단 보류
                         DownKey = event.key
                         print(f"DownKey changed to: {pygame.key.name(DownKey)}")
                         # 업데이트된 키 매핑 저장

@@ -4,6 +4,7 @@
         "Right": "right",
         "Jump": "up",
         "Down": "down",
-        "Gliding": "a"
+        "Gliding": "a",
+        "Up": "up"
     }
 }
