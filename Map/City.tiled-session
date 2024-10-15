@@ -1,0 +1,36 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "City.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "City.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 955,
+                "y": 585
+            }
+        },
+        "PurpleRocks.tsx": {
+            "scaleInDock": 1
+        }
+    },
+    "last.exportedFilePath": "C:/Users/user/Desktop/만든거/겜개_레포들/Python_HanYang/Map",
+    "map.height": 30,
+    "map.lastUsedExportFilter": "All Files (*)",
+    "map.lastUsedFormat": "tmx",
+    "openFiles": [
+        "City.tmx"
+    ],
+    "project": "City.tiled-project",
+    "recentFiles": [
+        "City.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx"
+}
