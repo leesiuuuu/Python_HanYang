@@ -37,7 +37,7 @@ class Player:
         self.y_velocity = 0
         self.jumptofall_timer = 0
         self.glide_enable_timer = 0
-        self.animation = Animation(frame_count=[6, 10, 3, 3, 3, 3, 4])
+        self.animation = Animation(frame_count=[6, 10, 3, 3, 3, 3, 4, 7, 3])
         self.sheet = pygame.image.load('Sprite/Mei-Sheet.png').convert_alpha()
         self.last_update = pygame.time.get_ticks()
 
@@ -76,6 +76,8 @@ class Player:
     def start_glide(self):
         if self.jumping and pygame.time.get_ticks() - self.glide_enable_timer > 200 and not self.gliding:
             self.gliding = True
+            self.animation.state = 7
+            self.animation.current_frame = 0
 
     def stop_glide(self):
         self.gliding = False
@@ -141,6 +143,7 @@ class Player:
             self.x -= self.speed
 
         if self.jumping:
+            # 점프 중일 때의 처리
             self.y += self.y_velocity
             if self.gliding:
                 self.y_velocity += GLIDE_GRAVITY
@@ -155,6 +158,31 @@ class Player:
                 self.y = self.ground_y
                 self.stop_fall()  # stop_fall 메서드 호출
 
+            if self.gliding:
+                if self.animation.state == 7:
+                    if self.animation.current_frame == self.animation.frame_count[7] - 1:
+                        self.animation.state = 8
+                        self.animation.current_frame = 0  # 새로운 상태로 넘어갈 때 첫 프레임으로 초기화
+                elif self.animation.state == 8:
+                    pass  # 상태 9에서는 아무것도 하지 않고 유지
+            else:
+                # 점프 중 하강 처리
+                if self.y_velocity > 0 and self.animation.state == 2:
+                    self.animation.state = 3  # 점프에서 떨어지는 상태로 변경 (jumptofall)
+                    self.animation.current_frame = 0  # 첫 프레임으로 초기화
+
+                if self.animation.state == 3:
+                    if self.y >= self.ground_y:
+                        self.animation.state = 4  # 떨어진 후 착지 애니메이션으로 변경 (fall)
+                        self.animation.current_frame = 0
+
+        else:
+            # 점프가 아닐 때의 처리
+            if self.moving_right or self.moving_left:
+                self.animation.state = 1  # 걷는 상태로 전환
+            else:
+                self.animation.state = 0  # 대기 상태로 전환
+
     def draw(self, screen, camera_x, camera_y):
         now = pygame.time.get_ticks()
         if now - self.last_update > self.animation.animation_speed:
@@ -168,7 +196,15 @@ class Player:
             self.animation.frame_height
         )
 
-        current_frame_surface = self.sheet.subsurface(player_rect)
+        # subsurface를 호출하기 전에 player_rect가 시트의 크기를 벗어나지 않도록 확인
+        sheet_width = self.sheet.get_width()
+        sheet_height = self.sheet.get_height()
+
+        if (player_rect.right <= sheet_width and player_rect.bottom <= sheet_height):
+            current_frame_surface = self.sheet.subsurface(player_rect)
+        else:
+            print("Invalid player_rect:", player_rect)  # 오류 디버깅 용도
+            return  # 잘못된 경우 draw를 중단
 
         if self.facing_right:
             final_player_image = current_frame_surface
@@ -181,6 +217,7 @@ class Player:
         )
 
         screen.blit(final_player_image, (self.x - camera_x, self.y - camera_y))
+
 
 class Camera:
     def __init__(self, width, height):
